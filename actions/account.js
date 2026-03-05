@@ -6,6 +6,9 @@ import { revalidatePath } from "next/cache";
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
 
+/* ---------------------------------- */
+/* Utility: Convert Prisma Decimal */
+/* ---------------------------------- */
 const serializeDecimal = (obj) => {
   const serialized = { ...obj };
 
@@ -20,6 +23,9 @@ const serializeDecimal = (obj) => {
   return serialized;
 };
 
+/* ---------------------------------- */
+/* Get Account + Transactions */
+/* ---------------------------------- */
 export async function getAccountWithTransactions(accountId) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -30,10 +36,10 @@ export async function getAccountWithTransactions(accountId) {
 
   if (!user) throw new Error("User not found");
 
-  const account = await db.account.findFirst({
+  // Always fetch account by unique ID
+  const account = await db.account.findUnique({
     where: {
       id: accountId,
-      userId: user.id,
     },
     include: {
       transactions: {
@@ -45,7 +51,10 @@ export async function getAccountWithTransactions(accountId) {
     },
   });
 
-  if (!account) return null;
+  // Security check: ensure account belongs to the user
+  if (!account || account.userId !== user.id) {
+    throw new Error("Account not found");
+  }
 
   return {
     ...serializeDecimal(account),
@@ -53,6 +62,9 @@ export async function getAccountWithTransactions(accountId) {
   };
 }
 
+/* ---------------------------------- */
+/* Bulk Delete Transactions */
+/* ---------------------------------- */
 export async function bulkDeleteTransactions(transactionIds) {
   try {
     const { userId } = await auth();
@@ -75,6 +87,7 @@ export async function bulkDeleteTransactions(transactionIds) {
 
     if (!user) throw new Error("User not found");
 
+    // Get transactions to calculate balance changes
     const transactions = await db.transaction.findMany({
       where: {
         id: { in: transactionIds },
@@ -82,6 +95,7 @@ export async function bulkDeleteTransactions(transactionIds) {
       },
     });
 
+    // Calculate balance adjustments
     const accountBalanceChanges = transactions.reduce((acc, transaction) => {
       const change =
         transaction.type === "EXPENSE"
@@ -94,6 +108,7 @@ export async function bulkDeleteTransactions(transactionIds) {
       return acc;
     }, {});
 
+    // Delete transactions and update balances
     await db.$transaction(async (tx) => {
       await tx.transaction.deleteMany({
         where: {
@@ -124,6 +139,9 @@ export async function bulkDeleteTransactions(transactionIds) {
   }
 }
 
+/* ---------------------------------- */
+/* Update Default Account */
+/* ---------------------------------- */
 export async function updateDefaultAccount(accountId) {
   try {
     const { userId } = await auth();
@@ -144,10 +162,9 @@ export async function updateDefaultAccount(accountId) {
       where: { clerkUserId: userId },
     });
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
+    // Remove current default
     await db.account.updateMany({
       where: {
         userId: user.id,
@@ -156,6 +173,7 @@ export async function updateDefaultAccount(accountId) {
       data: { isDefault: false },
     });
 
+    // Set new default
     const account = await db.account.update({
       where: {
         id: accountId,
@@ -165,7 +183,10 @@ export async function updateDefaultAccount(accountId) {
 
     revalidatePath("/dashboard");
 
-    return { success: true, data: serializeDecimal(account) };
+    return {
+      success: true,
+      data: serializeDecimal(account),
+    };
   } catch (error) {
     return { success: false, error: error.message };
   }
