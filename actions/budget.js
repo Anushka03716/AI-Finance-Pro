@@ -3,6 +3,8 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import aj from "@/lib/arcjet";
+import { request } from "@arcjet/next";
 
 export async function getCurrentBudget(accountId) {
   try {
@@ -30,6 +32,7 @@ export async function getCurrentBudget(accountId) {
       currentDate.getMonth(),
       1
     );
+
     const endOfMonth = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
@@ -68,6 +71,18 @@ export async function updateBudget(amount) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
+    // Arcjet protection
+    const req = await request();
+
+    const decision = await aj.protect(req, {
+      userId,
+      requested: 1,
+    });
+
+    if (decision.isDenied()) {
+      throw new Error("Request blocked");
+    }
+
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
@@ -89,6 +104,7 @@ export async function updateBudget(amount) {
     });
 
     revalidatePath("/dashboard");
+
     return {
       success: true,
       data: { ...budget, amount: budget.amount.toNumber() },
