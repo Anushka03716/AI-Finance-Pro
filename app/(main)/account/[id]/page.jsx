@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { AccountChart } from "../_components/account-chart";
 
 export default async function AccountPage({ params }) {
-  const { id } = params; // no need for await here
+  const { id } = await params; // no need for await here
 
   const accountData = await getAccountWithTransactions(id);
 
