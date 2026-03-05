@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+📊 AI Finance Pro
 
-## Getting Started
+AI Finance Pro is a modern AI-powered financial management platform that helps users track expenses, analyze transactions, and gain intelligent financial insights in real time.
 
-First, run the development server:
+Built with a modern full-stack architecture, the platform integrates authentication, database management, and interactive dashboards to create a seamless finance tracking experience.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌐 Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🚀 Try the live application here:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+🔗 https://ai-finance-pro-o723.vercel.app/
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+🚀 Features
+🔐 Secure Authentication
 
-## Learn More
+User authentication powered by Clerk
 
-To learn more about Next.js, take a look at the following resources:
+Secure login and session management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+User-specific financial data protection
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+💰 Financial Account Management
 
-## Deploy on Vercel
+Create and manage multiple financial accounts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Track balances in real time
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Categorize accounts (Savings, Credit, etc.)
+
+📊 Transaction Tracking
+
+Add income and expenses
+
+View transaction history
+
+Organized financial records
+
+📈 Data Visualization
+
+Interactive charts for spending analysis
+
+Real-time dashboard updates
+
+Transaction statistics
+
+🤖 AI Financial Insights
+
+AI-powered analysis of spending patterns
+
+Smart financial insights to optimize spending
+
+☁️ Cloud Deployment
+
+Deployed using Vercel
+
+Continuous deployment via GitHub
+
+🛠️ Tech Stack
+
+Frontend
+
+Next.js (App Router)
+
+React
+
+TailwindCSS
+
+ShadCN UI
+
+Backend
+
+Next.js Server Actions
+
+Prisma ORM
+
+Database
+
+PostgreSQL
+
+Authentication
+
+Clerk
+
+Deployment
+
+Vercel
+
+AI-Finance-Pro
+│
+├── app/                # Next.js app router pages
+├── components/         # UI components
+├── actions/            # Server actions
+├── lib/                # Utilities and database config
+├── public/             # Static assets
+├── prisma/             # Prisma schema and migrations
+├── middleware.js       # Clerk authentication middleware
+
